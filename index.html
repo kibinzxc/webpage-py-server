@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group 4 | Simple Webpage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="meteorCanvas"></canvas>
+
+    <div class="wrapper">
+        <!-- Card container -->
+        <div class="card-container">
+            <div class="card">
+                <img src="img/almirante.jpg">
+                <p>Almirante</p>
+            </div>
+            <div class="card">
+                <img src="img/araque.jpg">
+                <p>Araque</p>
+            </div>
+            <div class="card">
+                <img src="img/basmayor.jpg">
+                <p>Basmayor</p>
+            </div>
+            <div class="card">
+                <img src="img/bularon.jpg">
+                <p>Bularon</p>
+            </div>
+            <div class="card">
+                <img src="img/carasig.jpg">
+                <p>Carasig</p>
+            </div>
+            <div class="card">
+                <img src="img/glorioso.jpg">
+                <p>Glorioso</p>
+            </div>
+            <div class="card">
+                <img src="img/jauculan.jpg">
+                <p>Jauculan</p>
+            </div>
+            <div class="card">
+                <img src="img/magno.jpg">
+                <p>Magno</p>
+            </div>
+            <div class="card">
+                <img src="img/secuya.jpg">
+                <p>Secuya</p>
+            </div>
+            <div class="card">
+                <img src="img/sinadjan.jpg">
+                <p>Sinadjan</p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .wrapper {
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Align content to the top */
+            position: relative;
+            overflow-y: auto;
+            /* Enable vertical scrolling */
+            overflow-x: hidden;
+            flex-grow: 1;
+            padding: 20px;
+            padding-top: 50px;
+            /* Add space at the top */
+            box-sizing: border-box;
+            min-height: 100vh;
+            /* Ensure the wrapper takes at least the full viewport height */
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            z-index: 100;
+            max-width: 1500px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            width: 100%;
+            height: 400px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.1);
+            /* Increase size */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
+            /* More pronounced shadow */
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            overflow: hidden;
+
+        }
+
+        .card p {
+            margin-top: 5px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+        }
+    </style>
+
+    <script>
+        // Set up the canvas
+        const canvas = document.getElementById('meteorCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Particle class representing meteors
+        class Meteor {
+            constructor(x, y, radius, speed, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.speed = speed;
+                this.color = color;
+                this.directionX = Math.random() * 2 - 1; // Random direction in x-axis
+                this.directionY = Math.random() * 2 - 1; // Random direction in y-axis
+            }
+
+            // Method to update the position of each meteor
+            update(meteors) {
+                this.x += this.directionX * this.speed; // Move the meteor in x direction
+                this.y += this.directionY * this.speed; // Move the meteor in y direction
+
+                // Draw the meteor
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                // Draw lines connecting meteors
+                for (let i = 0; i < meteors.length; i++) {
+                    let meteor = meteors[i];
+                    let dist = Math.hypot(this.x - meteor.x, this.y - meteor.y);
+                    if (dist < 150) { // Only draw lines for meteors within a certain distance
+                        ctx.beginPath();
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(meteor.x, meteor.y);
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Generate default meteors
+        const meteors = [];
+        const maxMeteors = 150; // Maximum number of meteors allowed at a time
+
+        // Create a large number of initial meteors
+        const initialMeteorsCount = 100;
+        for (let i = 0; i < initialMeteorsCount; i++) {
+            let radius = Math.random() * 3 + 1;
+            let x = Math.random() * canvas.width;
+            let y = Math.random() * canvas.height;
+            let speed = Math.random() * 1 + 0.1;
+            let color = 'white';
+            meteors.push(new Meteor(x, y, radius, speed, color));
+        }
+
+        // Automatically spawn new meteors at random intervals
+        const spawnInterval = 50; // Time interval in milliseconds for spawning new meteors
+        let lastSpawnTime = 0;
+
+        function spawnMeteor() {
+            const now = Date.now();
+            if (now - lastSpawnTime > spawnInterval) {
+                // Create a new meteor at a random position
+                let radius = Math.random() * 3 + 1;
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                let speed = Math.random() * 1 + 0.5;
+                let color = 'white';
+                meteors.push(new Meteor(x, y, radius, speed, color));
+
+                // Remove oldest meteor if the limit is exceeded
+                if (meteors.length > maxMeteors) {
+                    meteors.shift();
+                }
+
+                lastSpawnTime = now;
+            }
+        }
+
+        // Mouse position for spawning meteors
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+        const spawnCooldown = 200; // Delay between mouse-triggered meteor spawns (in ms)
+        let lastMouseSpawnTime = 0;
+
+        canvas.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            if (now - lastMouseSpawnTime > spawnCooldown) {
+                mouseX = e.x;
+                mouseY = e.y;
+                // Spawn a meteor at the cursor position
+                let radius = Math.random() * 3 + 1;
+                let speed = Math.random() * 0.1 + 0.01;
+                let color = 'white';
+                meteors.push(new Meteor(mouseX, mouseY, radius, speed, color));
+
+                // Remove oldest meteor if the limit is exceeded
+                if (meteors.length > maxMeteors) {
+                    meteors.shift();
+                }
+
+                lastMouseSpawnTime = now;
+            }
+        });
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+            // Spawn new meteors automatically
+            spawnMeteor();
+
+            for (let i = 0; i < meteors.length; i++) {
+                meteors[i].update(meteors); // Update meteor position
+            }
+
+            requestAnimationFrame(animate); // Keep animating
+        }
+
+        // Start the animation
+        animate();
+
+        // Handle resizing of the window
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
+</body>
+
+</html>
