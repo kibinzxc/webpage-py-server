@@ -1,6 +1,6 @@
 # 🌐 Simple Webpage Python Server
 
-A basic Python web server used to serve a simple HTML webpage. This project was created for a presentation in **SYSTEMS ADMINISTRATION AND MAINTENANCE** to demonstrate serving static content without using a full web framework.
+A basic Python web server used to serve a simple HTML webpage. This project was created for an academic presentation in **SYSTEMS ADMINISTRATION AND MAINTENANCE** to demonstrate serving static content without using a full web framework.
 
 ## 🎯 Purpose
 
